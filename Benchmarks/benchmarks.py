@@ -19,7 +19,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '-n',
         '--image_number',
-        default=50,
+        default=500,
         type=int,
         help='the number of images to benchmark on')
     parser.add_argument(
@@ -67,6 +67,7 @@ if __name__ == '__main__':
     time_list = []
 
     for i in range(args.image_number):
+        print("Image {}/{}".format(i+1, args.image_number), end='\r')
         file = database[random.randint(1, len(database)-1)]
         img = Image.open("{}ImagesPS4/{}.jpg".format(args.image_directory, file["Images"])).resize((width, height))
 
@@ -84,4 +85,5 @@ if __name__ == '__main__':
 
         time_list.append(stop_time-start_time)
     
+    print("Processing image: {}/{}".format(args.image_number, args.image_number))
     print("Average: {} µs".format(1000*stats.mean(time_list)))
