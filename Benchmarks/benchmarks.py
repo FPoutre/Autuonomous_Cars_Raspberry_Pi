@@ -4,6 +4,7 @@ import csv
 import random
 
 import numpy as np
+from math import floor
 import statistics as stats
 from PIL import Image
 import tflite_runtime.interpreter as tflite
@@ -64,10 +65,13 @@ if __name__ == '__main__':
     height = input_details[0]['shape'][1]
     width = input_details[0]['shape'][2]
 
+    total_start_time = time.time()
     time_list = []
 
     for i in range(args.image_number):
-        print("Image {}/{}".format(i+1, args.image_number), end='\r')
+        minutes = floor(time.time() - total_start_time)//60
+        seconds = floor(time.time() - total_start_time)%60
+        print("Image {}/{}, {}m{}s".format(i+1, args.image_number, minutes, seconds), end='\r')
         file = database[random.randint(1, len(database)-1)]
         img = Image.open("{}ImagesPS4/{}.jpg".format(args.image_directory, file["Images"])).resize((width, height))
 
@@ -85,5 +89,5 @@ if __name__ == '__main__':
 
         time_list.append(stop_time-start_time)
     
-    print("Processing image: {}/{}".format(args.image_number, args.image_number))
+    print("Processing image: {}/{}, {}m{}s".format(args.image_number, args.image_number, minutes, seconds))
     print("Average: {} µs".format(1000*stats.mean(time_list)))
