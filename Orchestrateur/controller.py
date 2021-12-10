@@ -1,11 +1,11 @@
 import picarmini
 
-class PicarControl :
+class PicarControl:
 
     def __init__(self):
         picarmini.dir_servo_angle_calibration(0)
 
-    def setSpeed(speed):
+    def setSpeed(self, speed):
         if speed == 0:
             picarmini.stop()
         elif speed > 0:
@@ -13,5 +13,5 @@ class PicarControl :
         else:
             picarmini.backward(-speed)
     
-    def turn(angle):
+    def turn(self, angle):
         picarmini.set_dir_servo_angle(angle)
