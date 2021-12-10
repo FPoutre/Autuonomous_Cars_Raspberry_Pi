@@ -88,6 +88,8 @@ if __name__ == '__main__':
         stop_time = time.time()
 
         time_list.append(stop_time-start_time)
+
+        output_data = interpreter.get_tensor(output_details[0]['index'])
     
     print("Processing image: {}/{}, {}m{}s".format(args.image_number, args.image_number, minutes, seconds))
     print("Average: {} µs".format(1000*stats.mean(time_list)))
