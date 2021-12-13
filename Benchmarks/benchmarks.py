@@ -67,6 +67,7 @@ if __name__ == '__main__':
 
     total_start_time = time.time()
     time_list = []
+    offset_list = []
 
     for i in range(args.image_number):
         minutes = floor(time.time() - total_start_time)//60
@@ -87,9 +88,11 @@ if __name__ == '__main__':
         interpreter.invoke()
         stop_time = time.time()
 
-        time_list.append(stop_time-start_time)
+        predicted_angle = 35*interpreter.get_tensor(output_details[0]['index'])[0][0]
 
-        output_data = interpreter.get_tensor(output_details[0]['index'])
+        time_list.append(stop_time - start_time)
+        offset_list.append(np.abs(predicted_angle - float(file["Steering"])))
     
     print("Processing image: {}/{}, {}m{}s".format(args.image_number, args.image_number, minutes, seconds))
-    print("Average: {} µs".format(1000*stats.mean(time_list)))
+    print("Average time (per prediction) : {} µs".format(1000*stats.mean(time_list)))
+    print("Average prediction offset : {}°".format(stats.mean(offset_list)))
