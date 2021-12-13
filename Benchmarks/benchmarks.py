@@ -88,7 +88,7 @@ if __name__ == '__main__':
         interpreter.invoke()
         stop_time = time.time()
 
-        predicted_angle = interpreter.get_tensor(output_details[0]['index'])[0][0]
+        predicted_angle = 35*interpreter.get_tensor(output_details[0]['index'])[0][0]
 
         time_list.append(stop_time - start_time)
         offset_list.append(np.abs(predicted_angle - float(file["Steering"])))
