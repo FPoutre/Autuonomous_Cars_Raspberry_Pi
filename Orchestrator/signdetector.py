@@ -55,4 +55,4 @@ def continuousDetection(signDetector):
     while not False:
         sleep(1/signDetector.freq)
         speed = signDetector.predict()
-        signDetector.picar.forward(speed)
+        signDetector.picar.setSpeed(speed)
