@@ -6,9 +6,21 @@ import random
 import numpy as np
 from math import floor
 import statistics as stats
-from PIL import Image
+import cv2
 import tflite_runtime.interpreter as tflite
+import matplotlib.pyplot as plt
 
+
+def my_imread(image_path):
+    image = cv2.imread(image_path)
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    return image
+
+def img_preprocess(image):
+    height, _, _ = image.shape
+    image = image[int(height/2):,:,:]  # remove top half of the image, as it is not relavant for lane following
+    image = image / 255                # normalizing the pixel values 
+    return image
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -38,11 +50,6 @@ if __name__ == '__main__':
         default=127.5, 
         type=float,
         help='input standard deviation')
-    parser.add_argument(
-        '--num_threads', 
-        default=4, 
-        type=int, 
-        help='number of threads')
     args = parser.parse_args()
 
     database = []
@@ -51,19 +58,14 @@ if __name__ == '__main__':
         for row in csv_dict_reader:
             database.append(row)
 
-    interpreter = tflite.Interpreter(
-        model_path=args.model_file, num_threads=args.num_threads)
+    interpreter = tflite.Interpreter(model_path=args.model_file)
     interpreter.allocate_tensors()
 
     input_details = interpreter.get_input_details()
     output_details = interpreter.get_output_details()
 
-    # check the type of the input tensor
-    floating_model = input_details[0]['dtype'] == np.float32
-
     # NxHxWxC, H:1, W:2
-    height = input_details[0]['shape'][1]
-    width = input_details[0]['shape'][2]
+    input_shape = input_details[0]['shape']
 
     total_start_time = time.time()
     time_list = []
@@ -74,15 +76,10 @@ if __name__ == '__main__':
         seconds = floor(time.time() - total_start_time)%60
         print("Image {}/{}, {}m{}s".format(i+1, args.image_number, minutes, seconds), end='\r')
         file = database[random.randint(1, len(database)-1)]
-        img = Image.open("{}ImagesPS4/{}.jpg".format(args.image_directory, file["Images"])).resize((width, height))
-
-        # add N dim
-        input_data = np.expand_dims(img, axis=0)
-
-        if floating_model:
-            input_data = (np.float32(input_data) - args.input_mean) / args.input_std
-
-        interpreter.set_tensor(input_details[0]['index'], input_data)
+        img = plt.imread("{}ImagesPS4/{}.jpg".format(args.image_directory, file["Images"]))
+        img = img_preprocess(img)
+        img = np.reshape(img,(-1,120,320,3)).astype('float32')
+        interpreter.set_tensor(input_details[0]['index'], img)
 
         start_time = time.time()
         interpreter.invoke()
