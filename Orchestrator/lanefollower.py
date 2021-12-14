@@ -11,39 +11,27 @@ class LaneFollower:
 
         self.picar = controller
 
+        self.cap = cv2.VideoCapture(0)
+
         self.interpreter = tflite.Interpreter("../LaneFollowingModel/model.tflite")
         self.interpreter.allocate_tensors()
 
         self.input_details = self.interpreter.get_input_details()
         self.output_details = self.interpreter.get_output_details()
 
-        # check the type of the input tensor
-        self.floating_model = self.input_details[0]['dtype'] == np.float32
 
         # NxHxWxC, H:1, W:2
-        self.height = self.input_details[0]['shape'][1]
-        self.width = self.input_details[0]['shape'][2]
-
-        self.cap = cv2.VideoCapture(0)
+        self.input_shape = self.input_details[0]['shape']
 
     def predict(self):
         ret, img = self.cap.read()
         img = imgPreprocess(img)
-        np.reshape(img, (self.width, self.height))
-
-        # add N dim
-        input_data = np.expand_dims(img, axis=0)
-
-        if self.floating_model:
-            input_data = (np.float32(input_data) - 127.5) / 127.5
-
-        self.interpreter.set_tensor(self.input_details[0]['index'], input_data)
+        img = np.reshape(img,(-1,120,320,3)).astype('float32')
+        self.interpreter.set_tensor(self.input_details[0]['index'], img)
 
         self.interpreter.invoke()
 
-        output_data = self.interpreter.get_tensor(self.output_details[0]['index'])
-
-        return 35*output_data[0][0]
+        return 35*self.interpreter.get_tensor(self.output_details[0]['index'])[0][0]
 
 def imgPreprocess(image):
     height, _, _ = image.shape
