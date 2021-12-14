@@ -2,7 +2,6 @@ from time import sleep
 import numpy as np
 import tflite_runtime.interpreter as tflite
 import cv2
-from controller import PicarControl
 
 class LaneFollower:
 
