@@ -19,10 +19,6 @@ class LaneFollower:
         self.input_details = self.interpreter.get_input_details()
         self.output_details = self.interpreter.get_output_details()
 
-
-        # NxHxWxC, H:1, W:2
-        self.input_shape = self.input_details[0]['shape']
-
     def predict(self):
         ret, img = self.cap.read()
         img = imgPreprocess(img)
