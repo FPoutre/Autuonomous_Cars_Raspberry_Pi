@@ -1,6 +1,5 @@
 from signdetector import SignDetector
 from controller import PicarControl
-import matplotlib.pyplot as plt
 
 picar = PicarControl()
 signDetector = SignDetector(1, picar)
@@ -14,9 +13,4 @@ sign_classes = {
 }
 
 predictedSpeed = sign_classes[signDetector.predict()]
-
-ret, img = signDetector.cap.read()
-plt.title("Detected Sign : {}".format(predictedSpeed))
-plt.axis('off')
-plt.imshow(img)
-plt.show()
+print("Detected Sign : {}".format(predictedSpeed))
