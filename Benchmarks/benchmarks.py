@@ -7,7 +7,9 @@ import numpy as np
 from math import floor
 import statistics as stats
 import cv2
-import tflite_runtime.interpreter as tflite
+#import tflite_runtime.interpreter as tflite
+
+import tensorflow as tf
 import matplotlib.pyplot as plt
 
 
@@ -58,7 +60,7 @@ if __name__ == '__main__':
         for row in csv_dict_reader:
             database.append(row)
 
-    interpreter = tflite.Interpreter(model_path=args.model_file)
+    interpreter =tf.lite.Interpreter(model_path=args.model_file)
     interpreter.allocate_tensors()
 
     input_details = interpreter.get_input_details()
