@@ -27,11 +27,13 @@ Points manquants :
 ##### Pruning
 En cours.
 Points manquants :
-- TITOUAN, ATTAQUE !
+- Citations
+- Benchmarks Original Model vs Pruned Model
 ##### Quantization
 En cours.
 Points manquants :
-- TITOUAN, ATTAQUE !
+- Citations
+- Benchmarks Original Model vs Quantized Model
 ### Travail Réalisé
 ##### Organisation
 A faire.
@@ -78,3 +80,5 @@ A faire.
 - L. Giffon, S. Ayache, H. Kadri, T. Artieres, et R. Sicre, « PSM-nets: Compressing Neural Networks with Product of Sparse Matrices », in 2021 International Joint Conference on Neural Networks (IJCNN), Shenzhen, China, juill. 2021, p. 1‑8. doi: 10.1109/IJCNN52387.2021.9533408.
 - T. Jin et S. Hong, « Split-CNN: Splitting Window-based Operations in Convolutional Neural Networks for Memory System Optimization », in Proceedings of the Twenty-Fourth International Conference on Architectural Support for Programming Languages and Operating Systems, New York, NY, USA, avr. 2019, p. 835‑847. doi: 10.1145/3297858.3304038.
 - M. Zhu et S. Gupta, « To prune, or not to prune: exploring the efficacy of pruning for model compression », arXiv:1710.01878 [cs, stat], nov. 2017. [En ligne]. Disponible sur: http://arxiv.org/abs/1710.01878
+- Y. Ding, J. Liu, and Y. Shi, « On the universal approximability of quantized relu neural networks » CoRR, vol. abs/1802.03646, 2018. Disponible sur: http://arxiv.org/abs/1802.03646
+
