@@ -10,16 +10,16 @@ laneFollower = lanefollower.LaneFollower(5, picar)
 signDetector = signdetector.SignDetector(5, picar)
 
 laneFollowerThread = Thread(target=lanefollower.continuousDetection, args=(laneFollower))
-signDetectorThread = Thread(target=signdetector.continuousDetection, args=(signDetector))
+# signDetectorThread = Thread(target=signdetector.continuousDetection, args=(signDetector))
 
 laneFollowerThread.start()
-signDetectorThread.start()
+# signDetectorThread.start()
 
 inputS = ""
 
-while inputS != "exit":
-    inputS = input("Enter \"exit\" to stop process.")
+while inputS != "exit" and inputS != "q":
+    inputS = input("Enter \"q\" or \"exit\" to stop process.")
 
 laneFollowerThread.join()
-signDetectorThread.join()
+# signDetectorThread.join()
 sys.exit()
