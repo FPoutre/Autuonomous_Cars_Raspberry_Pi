@@ -1,4 +1,4 @@
-from controller import PicarControl
+from ..controller import PicarControl
 from time import sleep
 
 
