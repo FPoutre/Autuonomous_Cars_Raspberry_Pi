@@ -1,5 +1,5 @@
-from ..lanefollower import LaneFollower
-from ..controller import PicarControl
+from lanefollower import LaneFollower
+from controller import PicarControl
 
 picar = PicarControl()
 laneFollower = LaneFollower(1, picar)
