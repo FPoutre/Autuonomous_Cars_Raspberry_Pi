@@ -1,30 +1,29 @@
-from controller import PicarControl
-from time import sleep
+import sys
+import time
+sys.path.append(r'/opt/ezblock')
+from picarmini import dir_servo_angle_calibration, set_dir_servo_angle
+from picarmini import stop, backward, forward
 
+if __name__ == "__main__":
+    print("Calibration")
+    dir_servo_angle_calibration(0)
 
-picar = PicarControl()
+    print("Forward")
+    backward(10)
 
-def backAndForth():
-    picar.setSpeed(30)
-    sleep(3)
-    picar.setSpeed(0)
-    sleep(3)
-    picar.setSpeed(-30)
-    sleep(3)
-    picar.setSpeed(0)
+    print("Left 30° 1.5s")
+    set_dir_servo_angle(-30)
+    time.sleep(1.5)
 
-def leftTurn():
-    picar.turn(-45)
-    sleep(1)
-    backAndForth()
+    print("Reverse")
+    forward(10)
 
-def rightTurn():
-    picar.turn(90)
-    sleep(1)
-    backAndForth()
+    print("Right 30° 1.5s")
+    set_dir_servo_angle(30)
+    time.sleep(1.5)
 
-backAndForth()
-leftTurn()
-rightTurn()
-picar.turn(-45)
-sleep(3)
+    print("Stop")
+    stop()
+    set_dir_servo_angle(0)
+
+    print("Done")

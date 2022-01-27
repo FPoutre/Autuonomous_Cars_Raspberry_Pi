@@ -4,13 +4,16 @@ import tflite_runtime.interpreter as tflite
 import cv2
 import skimage
 
+sys.path.append(r'/opt/ezblock')
+from picarmini import backward, stop
+
 class SignDetector:
 
-    def __init__(self, freq, controller):
+    def __init__(self, freq):
         self.freq = freq
 
-        self.picar = controller
         self.speedLimit = 50
+        backward(self.speedLimit)
 
         self.cap = cv2.VideoCapture(0)
 
@@ -49,12 +52,12 @@ def continuousDetection(signDetector):
         prediction = signDetector.predict()
 
         if prediction == 0:
-            signDetector.picar.setSpeed(30)
+            backward(30)
             signDetector.speedLimit = 30
         elif prediction == 1:
-            signDetector.picar.setSpeed(50)
+            backward(50)
             signDetector.speedLimit = 50
         elif prediction == 3:
-            signDetector.picar.setSpeed(0)
+            stop()
             sleep(3)
             signDetector.picar.setSpeed(signDetector.speedLimit)
