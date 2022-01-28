@@ -1,4 +1,4 @@
-from time import sleep
+import time
 import sys
 import threading
 import numpy as np
@@ -18,7 +18,7 @@ class LaneFollower(threading.Thread):
 
         self.cap = cv2.VideoCapture(0)
 
-        self.interpreter = tflite.Interpreter("../LaneFollowingModel/model.tflite")
+        self.interpreter = tflite.Interpreter("../LaneFollowingModel/quantized_and_pruned_model.tflite")
         self.interpreter.allocate_tensors()
 
         self.input_details = self.interpreter.get_input_details()
@@ -41,16 +41,18 @@ class LaneFollower(threading.Thread):
         img = np.expand_dims(img, axis=0).astype('float32')
         self.interpreter.set_tensor(self.input_details[0]['index'], img)
 
+        start_t = time.time_ns()
         self.interpreter.invoke()
+        delta_t = (time.time_ns() - start_t)/1000000
 
         res = 35*self.interpreter.get_tensor(self.output_details[0]['index'])[0][0]
-        print("Predicted Angle: {}°".format(res))
+        print("Predicted Angle: {}° ({} ms)".format(res, delta_t))
 
         return res
 
     def run(self):
         while not self.kill:
             if self.freq != -1:
-                sleep(1/self.freq)
+                time.sleep(1/self.freq)
             angle = self.predict()
             set_dir_servo_angle(angle)
