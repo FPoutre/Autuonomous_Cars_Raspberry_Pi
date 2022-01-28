@@ -27,7 +27,10 @@ class LaneFollower:
 
         self.interpreter.invoke()
 
-        return 35*self.interpreter.get_tensor(self.output_details[0]['index'])[0][0]
+        res = 35*self.interpreter.get_tensor(self.output_details[0]['index'])[0][0]
+        print("Predicted Angle: {}°".format(res))
+
+        return res
 
     def imgPreprocess(image):
         height, _, _ = image.shape
