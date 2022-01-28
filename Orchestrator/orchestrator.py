@@ -17,6 +17,7 @@ def cleanup(sig, frame):
     laneFollower.join()
     # signDetector.join()
     print("All threads stopped")
+    set_dir_servo_angle(0)
     stop()
     print("Goodbye !")
     sys.exit(0)
