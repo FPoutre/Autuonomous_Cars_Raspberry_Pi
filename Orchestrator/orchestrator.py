@@ -6,13 +6,19 @@ sys.path.append(r'/opt/ezblock')
 from picarmini import dir_servo_angle_calibration, set_dir_servo_angle
 from picarmini import stop, backward
 
-import lanefollower
-import signdetector
+from lanefollower import LaneFollower
+# from signdetector import SignDetector
+
 
 def cleanup(sig, frame):
-    laneFollowerThread.join()
-    # signDetectorThread.join()
+    print("Stopping all threads")
+    laneFollower.kill = True
+    # signDetector.kill = True
+    laneFollower.join()
+    # signDetector.join()
+    print("All threads stopped")
     stop()
+    print("Goodbye !")
     sys.exit(0)
 
 if __name__ == "__main__":
@@ -20,17 +26,11 @@ if __name__ == "__main__":
     set_dir_servo_angle(0)
     backward(10)
 
-    laneFollower = lanefollower.LaneFollower(5)
-    signDetector = signdetector.SignDetector(5)
+    laneFollower = LaneFollower(-1)
+    # signDetector = SignDetector(-1)
 
-    laneFollowerThread = Thread(target=lanefollower.continuousDetection, args=(laneFollower))
-    # signDetectorThread = Thread(target=signdetector.continuousDetection, args=(signDetector))
-
-    laneFollowerThread.start()
-    # signDetectorThread.start()
+    laneFollower.start()
+    # signDetector.start()
 
     signal.signal(signal.SIGINT, cleanup)
     signal.pause()
-
-    while True:
-        continue

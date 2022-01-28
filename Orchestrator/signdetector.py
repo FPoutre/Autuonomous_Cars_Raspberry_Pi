@@ -1,4 +1,6 @@
 from time import sleep
+import sys
+import threading
 import numpy as np
 import tflite_runtime.interpreter as tflite
 import cv2
@@ -7,10 +9,13 @@ import skimage
 sys.path.append(r'/opt/ezblock')
 from picarmini import backward, stop
 
-class SignDetector:
+class SignDetector(threading.Thread):
 
     def __init__(self, freq):
+        threading.Thread.__init__(self)
+        
         self.freq = freq
+        self.kill = False
 
         self.speedLimit = 50
         backward(self.speedLimit)
@@ -46,18 +51,18 @@ class SignDetector:
 
         return np.argmax(self.interpreter.get_tensor(self.output_details[0]['index']))
 
-def continuousDetection(signDetector):
-    while not False:
-        sleep(1/signDetector.freq)
-        prediction = signDetector.predict()
+    def run(self):
+        while not self.kill:
+            sleep(1/self.freq)
+            prediction = self.predict()
 
-        if prediction == 0:
-            backward(30)
-            signDetector.speedLimit = 30
-        elif prediction == 1:
-            backward(50)
-            signDetector.speedLimit = 50
-        elif prediction == 3:
-            stop()
-            sleep(3)
-            signDetector.picar.setSpeed(signDetector.speedLimit)
+            if prediction == 0:
+                backward(30)
+                self.speedLimit = 30
+            elif prediction == 1:
+                backward(50)
+                self.speedLimit = 50
+            elif prediction == 3:
+                stop()
+                sleep(3)
+                backward(self.speedLimit)
