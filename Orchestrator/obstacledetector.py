@@ -7,6 +7,8 @@ from ezblock import Pin, Ultrasonic
 
 class ObstacleDetector(threading.Thread):
 
+    STOP_THRESH = 10
+
     def __init__(self):
         threading.Thread.__init__(self)
 
@@ -22,10 +24,10 @@ class ObstacleDetector(threading.Thread):
     def run(self):
         while not self.kill:
             if not self.stopped:
-                if self.detector.read() < 5:
+                if self.detector.read() < ObstacleDetector.STOP_THRESH:
                     stop()
                     self.stopped = True
             else:
-                if self.detector.read() > 5:
+                if self.detector.read() > ObstacleDetector.STOP_THRESH:
                     backward(self.speed)
                     self.stopped = False
