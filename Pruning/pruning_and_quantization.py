@@ -229,7 +229,18 @@ def convert_to_tflite_quantized_and_pruned_model(model_for_export):
     with open('../LaneFollowingModel/dq_pruned_model.tflite', 'wb') as f:
       f.write(quantized_and_pruned_tflite_model)
       print("TFlite Dynamic Range Quantized and Pruned Model Saved")
-     
+
+
+def convert_to_tflite_f16_pruned_model(model_for_export):
+    converter = tf.lite.TFLiteConverter.from_keras_model(model_for_export)
+    converter.optimizations = [tf.lite.Optimize.DEFAULT]
+    converter.target_spec.supported_types = [tf.float16]
+    quantized_and_pruned_tflite_model = converter.convert()
+
+    with open('../LaneFollowingModel/f16q_pruned_model.tflite', 'wb') as f:
+      f.write(quantized_and_pruned_tflite_model)
+      print("TFlite float16 Quantized and Pruned Model Saved")
+
 
 def representative_dataset():
     global xTrain
@@ -238,8 +249,7 @@ def representative_dataset():
         yield [input_value]
 
 
-def convert_to_tflite_fiq_pruned_model(model):
-    import tensorflow as tf
+def convert_to_tflite_intq_pruned_model(model):
     converter = tf.lite.TFLiteConverter.from_keras_model(model)
     converter.optimizations = [tf.lite.Optimize.DEFAULT]
     converter.representative_dataset = representative_dataset
@@ -311,4 +321,5 @@ if __name__ == '__main__':
     
     convert_to_tflite_pruned_model(model_for_export)
     convert_to_tflite_quantized_and_pruned_model(model_for_export)
-    convert_to_tflite_fiq_pruned_model(model_for_export)
+    convert_to_tflite_f16_pruned_model(model_for_export)
+    # convert_to_tflite_intq_pruned_model(model_for_export)
