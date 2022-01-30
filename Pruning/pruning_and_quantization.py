@@ -163,8 +163,7 @@ def image_data_generator(image_paths, steering_angles, batch_size, is_training):
             batch_images.append(image)
             batch_steering_angles.append(steering_angle)
             
-        yield(np.asarray(batch_images), np.asarray(batch_steering_angles))
-        
+        yield(np.asarray(batch_images), np.asarray(batch_steering_angles))    
         
 def define_model_for_pruning(lane_following_model, imagesPath, epochs, batch_size ):
     
@@ -227,17 +226,37 @@ def convert_to_tflite_quantized_and_pruned_model(model_for_export):
     converter.optimizations = [tf.lite.Optimize.DEFAULT]
     quantized_and_pruned_tflite_model = converter.convert()
 
-    with open('../LaneFollowingModel/quantized_and_pruned_model.tflite', 'wb') as f:
+    with open('../LaneFollowingModel/dq_pruned_model.tflite', 'wb') as f:
       f.write(quantized_and_pruned_tflite_model)
-      print("TFlite Quantized and Pruned Model Saved")
+      print("TFlite Dynamic Range Quantized and Pruned Model Saved")
      
+
+def representative_dataset():
+    global imagesPath
+    index = random.randint(0, len(imagesPath))
+    img = my_imread(imagesPath[index])
+    img = img_preprocess(img)
+    yield np.reshape(img,(-1,120,320,3)).astype('float32')
+
+
+def convert_to_tflite_fiq_pruned_model(model):
+    import tensorflow as tf
+    converter = tf.lite.TFLiteConverter.from_keras_model(model)
+    converter.optimizations = [tf.lite.Optimize.DEFAULT]
+    converter.representative_dataset = representative_dataset
+    tflite_quant_model = converter.convert()
+
+    with open('../LaneFollowingModel/fiq_pruned_model.tflite', 'wb') as f:
+        f.write(tflite_quant_model)
+        print("TFlite Full Integer Quantized and Pruned Model Saved")
+
     
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '-p',
         '--path',
-        default='../../Data/',
+        default='../Data/',
         help='directory containing images to be classified, as well as DatabasePS4.csv')
     parser.add_argument(
         '-b',
@@ -293,6 +312,4 @@ if __name__ == '__main__':
     
     convert_to_tflite_pruned_model(model_for_export)
     convert_to_tflite_quantized_and_pruned_model(model_for_export)
-
-
-
+    convert_to_tflite_fiq_pruned_model(model_for_export)
