@@ -232,11 +232,10 @@ def convert_to_tflite_quantized_and_pruned_model(model_for_export):
      
 
 def representative_dataset():
-    global imagesPath
-    index = random.randint(0, len(imagesPath))
-    img = my_imread(imagesPath[index])
-    img = img_preprocess(img)
-    yield np.reshape(img,(-1,120,320,3)).astype('float32')
+    global xTrain
+    for input_value in xTrain[:100]:
+        # Model has only one input so each data point has one element.
+        yield [input_value]
 
 
 def convert_to_tflite_fiq_pruned_model(model):
