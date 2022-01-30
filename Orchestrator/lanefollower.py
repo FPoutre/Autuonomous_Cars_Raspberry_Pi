@@ -18,7 +18,7 @@ class LaneFollower(threading.Thread):
 
         self.cap = cv2.VideoCapture(0)
 
-        self.interpreter = tflite.Interpreter("../LaneFollowingModel/quantized_and_pruned_model.tflite")
+        self.interpreter = tflite.Interpreter("../LaneFollowingModel/dq_pruned_model.tflite")
         self.interpreter.allocate_tensors()
 
         self.input_details = self.interpreter.get_input_details()
