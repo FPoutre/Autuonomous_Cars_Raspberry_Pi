@@ -213,10 +213,10 @@ nrow = 2
 X_train_batch, y_train_batch = next(image_data_generator(xTrain, yTrain, nrow, True))
 X_valid_batch, y_valid_batch = next(image_data_generator(xVal, yVal, nrow, False))
 
-batch_size=16
+batch_size=8
 
 history = lane_following.fit(image_data_generator( xTrain, yTrain, batch_size=batch_size, is_training=True),
-                              steps_per_epoch=1000,
+                              steps_per_epoch=600,
                               epochs=100,
                               validation_data = image_data_generator( xVal, yVal, batch_size=batch_size, is_training=False),
                               validation_steps=300,

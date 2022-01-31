@@ -208,7 +208,7 @@ def pruned_model(model_for_pruning, xTrain, yTrain, xVal, yVal,epochs, batch_siz
     return model_for_pruning
 
 
-def convert_to_tflite_pruned_model(model_for_export):
+def convert_to_tflite(model_for_export):
     converter = tf.lite.TFLiteConverter.from_keras_model(model_for_export)
     pruned_tflite_model = converter.convert()
 
@@ -220,7 +220,7 @@ def convert_to_tflite_pruned_model(model_for_export):
     print("TFlite Pruned Model Saved")
 
 
-def convert_to_tflite_quantized_and_pruned_model(model_for_export):
+def convert_to_tflite_dynamic_quantization(model_for_export):
 
     converter = tf.lite.TFLiteConverter.from_keras_model(model_for_export)
     converter.optimizations = [tf.lite.Optimize.DEFAULT]
@@ -231,7 +231,7 @@ def convert_to_tflite_quantized_and_pruned_model(model_for_export):
       print("TFlite Dynamic Range Quantized and Pruned Model Saved")
 
 
-def convert_to_tflite_f16_pruned_model(model_for_export):
+def convert_to_tflite_f16_quantization(model_for_export):
     converter = tf.lite.TFLiteConverter.from_keras_model(model_for_export)
     converter.optimizations = [tf.lite.Optimize.DEFAULT]
     converter.target_spec.supported_types = [tf.float16]
@@ -249,7 +249,7 @@ def representative_dataset():
         yield [input_value]
 
 
-def convert_to_tflite_intq_pruned_model(model):
+def convert_to_tflite_int_quantization(model):
     converter = tf.lite.TFLiteConverter.from_keras_model(model)
     converter.optimizations = [tf.lite.Optimize.DEFAULT]
     converter.representative_dataset = representative_dataset
@@ -319,7 +319,8 @@ if __name__ == '__main__':
     
     model_for_export = tfmot.sparsity.keras.strip_pruning(pruned_model)
     
-    convert_to_tflite_pruned_model(model_for_export)
-    convert_to_tflite_quantized_and_pruned_model(model_for_export)
-    convert_to_tflite_f16_pruned_model(model_for_export)
-    # convert_to_tflite_intq_pruned_model(model_for_export)
+    convert_to_tflite(lane_following_model)
+    convert_to_tflite(model_for_export)
+    convert_to_tflite_dynamic_quantization(model_for_export)
+    convert_to_tflite_f16_quantization(model_for_export)
+    # convert_to_tflite_int_quantization(model_for_export)

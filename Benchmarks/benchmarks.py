@@ -93,5 +93,5 @@ if __name__ == '__main__':
         offset_list.append(np.abs(predicted_angle - float(file["Steering"])))
     
     print("Processing image: {}/{}, {}m{}s".format(args.image_number, args.image_number, minutes, seconds))
-    print("Average time (per prediction) : {} µs".format(1000*stats.mean(time_list)))
+    print("Average time (per prediction) : {} ms".format(1000*stats.mean(time_list)))
     print("Average prediction offset : {}°".format(stats.mean(offset_list)))
