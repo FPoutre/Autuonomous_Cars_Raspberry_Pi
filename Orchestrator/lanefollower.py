@@ -18,7 +18,7 @@ class LaneFollower(threading.Thread):
 
         self.cap = cv2.VideoCapture(0)
 
-        self.interpreter = tflite.Interpreter("../LaneFollowingModel/model.tflite")
+        self.interpreter = tflite.Interpreter("../LaneFollowingModel/dq_pruned_model.tflite")
         self.interpreter.allocate_tensors()
 
         self.input_details = self.interpreter.get_input_details()
@@ -43,10 +43,10 @@ class LaneFollower(threading.Thread):
 
         start_t = time.time_ns()
         self.interpreter.invoke()
-        duration = time.time_ns() - start_t
+        delta_t = (time.time_ns() - start_t)/1000000
 
         res = 35*self.interpreter.get_tensor(self.output_details[0]['index'])[0][0]
-        print("Predicted Angle: {}° ({}ms)".format(res, duration/1000000))
+        print("Predicted Angle: {}° ({} ms)".format(res, delta_t))
 
         return res
 
