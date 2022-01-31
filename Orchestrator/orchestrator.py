@@ -32,7 +32,7 @@ if __name__ == "__main__":
     dir_servo_angle_calibration(0)
     set_dir_servo_angle(0)
     set_camera_servo1_angle(0)
-    set_camera_servo2_angle(-10)
+    set_camera_servo2_angle(0)
 
     backward(10)
 
