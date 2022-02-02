@@ -1,25 +1,37 @@
 from threading import Thread
 import sys
+import signal
 
-import controller
-import lanefollower
-import signdetector
+sys.path.append(r'/opt/ezblock')
+from picarmini import dir_servo_angle_calibration, set_dir_servo_angle
+from picarmini import stop, backward
 
-picar = controller.PicarControl()
-laneFollower = lanefollower.LaneFollower(5, picar)
-signDetector = signdetector.SignDetector(5, picar)
+from lanefollower import LaneFollower
+# from signdetector import SignDetector
 
-laneFollowerThread = Thread(target=lanefollower.continuousDetection, args=(laneFollower))
-signDetectorThread = Thread(target=signdetector.continuousDetection, args=(signDetector))
 
-laneFollowerThread.start()
-signDetectorThread.start()
+def cleanup(sig, frame):
+    print("Stopping all threads")
+    laneFollower.kill = True
+    # signDetector.kill = True
+    laneFollower.join()
+    # signDetector.join()
+    print("All threads stopped")
+    set_dir_servo_angle(0)
+    stop()
+    print("Goodbye !")
+    sys.exit(0)
 
-inputS = ""
+if __name__ == "__main__":
+    dir_servo_angle_calibration(0)
+    set_dir_servo_angle(0)
+    backward(10)
 
-while inputS != "exit":
-    inputS = input("Enter \"exit\" to stop process.")
+    laneFollower = LaneFollower(-1)
+    # signDetector = SignDetector(-1)
 
-laneFollowerThread.join()
-signDetectorThread.join()
-sys.exit()
+    laneFollower.start()
+    # signDetector.start()
+
+    signal.signal(signal.SIGINT, cleanup)
+    signal.pause()
