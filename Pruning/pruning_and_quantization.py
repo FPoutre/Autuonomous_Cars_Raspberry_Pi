@@ -246,7 +246,7 @@ def representative_dataset():
     global xTrain
     for input_value in xTrain[:100]:
         # Model has only one input so each data point has one element.
-        yield [input_value]
+        yield [input_value.asType(np.float32)]
 
 
 def convert_to_tflite_int_quantization(model):
