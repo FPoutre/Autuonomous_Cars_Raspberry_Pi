@@ -35,12 +35,12 @@ from tensorflow.keras.models import model_from_json
 
 # load json and create model
 def load_model():
-    json_file = open("../LaneFollowingModel/model.json", 'r')
+    json_file = open("../LaneFollowingModel/source/model.json", 'r')
     loaded_model_json = json_file.read()
     json_file.close()
     loaded_model = model_from_json(loaded_model_json)
     # load weights into new model
-    loaded_model.load_weights("../LaneFollowingModel/model_weights.h5")
+    loaded_model.load_weights("../LaneFollowingModel/source/model_weights.h5")
     print("Model Loaded from disk")
     return loaded_model
     
@@ -214,7 +214,7 @@ def convert_to_tflite(model_for_export):
 
     # Save the model
 
-    with open('../LaneFollowingModel/pruned_model.tflite', 'wb') as f:
+    with open('../LaneFollowingModel/pruned/model.tflite', 'wb') as f:
       f.write(pruned_tflite_model)
     
     print("TFlite Pruned Model Saved")
@@ -226,7 +226,7 @@ def convert_to_tflite_dynamic_quantization(model_for_export):
     converter.optimizations = [tf.lite.Optimize.DEFAULT]
     quantized_and_pruned_tflite_model = converter.convert()
 
-    with open('../LaneFollowingModel/dq_pruned_model.tflite', 'wb') as f:
+    with open('../LaneFollowingModel/dq/model.tflite', 'wb') as f:
       f.write(quantized_and_pruned_tflite_model)
       print("TFlite Dynamic Range Quantized and Pruned Model Saved")
 
@@ -237,7 +237,7 @@ def convert_to_tflite_f16_quantization(model_for_export):
     converter.target_spec.supported_types = [tf.float16]
     quantized_and_pruned_tflite_model = converter.convert()
 
-    with open('../LaneFollowingModel/f16q_pruned_model.tflite', 'wb') as f:
+    with open('../LaneFollowingModel/f16q/model.tflite', 'wb') as f:
       f.write(quantized_and_pruned_tflite_model)
       print("TFlite float16 Quantized and Pruned Model Saved")
 
@@ -255,7 +255,7 @@ def convert_to_tflite_int_quantization(model):
     converter.representative_dataset = representative_dataset
     tflite_quant_model = converter.convert()
 
-    with open('../LaneFollowingModel/fiq_pruned_model.tflite', 'wb') as f:
+    with open('../LaneFollowingModel/intq/model.tflite', 'wb') as f:
         f.write(tflite_quant_model)
         print("TFlite Full Integer Quantized and Pruned Model Saved")
 
@@ -319,7 +319,6 @@ if __name__ == '__main__':
     
     model_for_export = tfmot.sparsity.keras.strip_pruning(pruned_model)
     
-    convert_to_tflite(lane_following_model)
     convert_to_tflite(model_for_export)
     convert_to_tflite_dynamic_quantization(model_for_export)
     convert_to_tflite_f16_quantization(model_for_export)
