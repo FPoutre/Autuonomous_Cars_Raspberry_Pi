@@ -164,7 +164,18 @@ def image_data_generator(image_paths, steering_angles, batch_size, is_training):
             batch_steering_angles.append(steering_angle)
             
         yield(np.asarray(batch_images), np.asarray(batch_steering_angles))    
-        
+     
+     
+def get_images(xT):
+    images = []
+    for i in xT[:1000]:
+        image = my_imread(i)
+        image,_ = random_augment(image, 0.)
+        image = img_preprocess(image)
+        images.append(image)
+
+    return images
+
 def define_model_for_pruning(lane_following_model, imagesPath, epochs, batch_size ):
     
     prune_low_magnitude = tfmot.sparsity.keras.prune_low_magnitude
@@ -243,11 +254,8 @@ def convert_to_tflite_f16_quantization(model_for_export):
 
 
 def representative_dataset():
-    global xTrain
-    for input_value in xTrain[:100]:
-        # Model has only one input so each data point has one element.
-        yield [input_value.asType(np.float32)]
-
+    for data in tf.data.Dataset.from_tensor_slices((get_images(xTrain))).batch(1).take(100):
+        yield [tf.dtypes.cast(data, tf.float32)]
 
 def convert_to_tflite_int_quantization(model):
     converter = tf.lite.TFLiteConverter.from_keras_model(model)
@@ -314,12 +322,12 @@ if __name__ == '__main__':
     print('Total Images : ',len(imagesPath))
     
     lane_following_model = load_model()
-    model_for_pruning = define_model_for_pruning(lane_following_model, imagesPath, args.epochs, args.batch_size)
-    pruned_model = pruned_model(model_for_pruning, xTrain, yTrain, xVal, yVal,args.epochs, args.batch_size)
+    # model_for_pruning = define_model_for_pruning(lane_following_model, imagesPath, args.epochs, args.batch_size)
+    # pruned_model = pruned_model(model_for_pruning, xTrain, yTrain, xVal, yVal,args.epochs, args.batch_size)
     
-    model_for_export = tfmot.sparsity.keras.strip_pruning(pruned_model)
+    # model_for_export = tfmot.sparsity.keras.strip_pruning(pruned_model)
     
-    convert_to_tflite(model_for_export)
-    convert_to_tflite_dynamic_quantization(model_for_export)
-    convert_to_tflite_f16_quantization(model_for_export)
-    # convert_to_tflite_int_quantization(model_for_export)
+    convert_to_tflite(lane_following_model)
+    convert_to_tflite_dynamic_quantization(lane_following_model)
+    convert_to_tflite_f16_quantization(lane_following_model)
+    convert_to_tflite_int_quantization(lane_following_model)
