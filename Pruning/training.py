@@ -16,8 +16,12 @@ from tensorflow.keras.layers import Conv2D, MaxPool2D, Dropout, Flatten, Dense
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.models import load_model
 from tensorflow.keras.utils import plot_model
-
 from tensorflow.keras import layers
+from tensorflow.keras.models import Model
+from tensorflow.keras.preprocessing import image
+from tensorflow.keras.applications.vgg16 import preprocess_input
+from tensorflow.keras.layers import Input
+from tensorflow.keras.applications.vgg16 import VGG16
 
 # sklearn
 from sklearn.utils import shuffle
@@ -184,7 +188,19 @@ def lane_following_model():
     
     return model
 
-lane_following = lane_following_model()
+
+vgg_model = VGG16(weights='imagenet', include_top=False, input_shape=(120,320,3)) # include_top=False is to not keep the top layer
+for layer in vgg_model.layers:
+    layer.trainable = False
+x_vgg = Flatten()(vgg_model.output)
+d_vgg = Dense(50, activation='elu')(x_vgg)
+dense3_vgg = Dense(10, activation='elu')(d_vgg)
+output_vgg = Dense(1, activation='tanh')(dense3_vgg)
+vgg = Model(inputs=vgg_model.input, outputs=output_vgg)
+optimizer_vgg = Adam(learning_rate=1e-3) # lr is learning rate
+vgg.compile(loss='mse', optimizer=optimizer_vgg)
+
+lane_following = vgg
 
 
 def image_data_generator(image_paths, steering_angles, batch_size, is_training):
@@ -213,10 +229,10 @@ nrow = 2
 X_train_batch, y_train_batch = next(image_data_generator(xTrain, yTrain, nrow, True))
 X_valid_batch, y_valid_batch = next(image_data_generator(xVal, yVal, nrow, False))
 
-batch_size=8
+batch_size=16
 
 history = lane_following.fit(image_data_generator( xTrain, yTrain, batch_size=batch_size, is_training=True),
-                              steps_per_epoch=600,
+                              steps_per_epoch=1000,
                               epochs=100,
                               validation_data = image_data_generator( xVal, yVal, batch_size=batch_size, is_training=False),
                               validation_steps=300,
@@ -225,7 +241,7 @@ history = lane_following.fit(image_data_generator( xTrain, yTrain, batch_size=ba
 
 # Save the model
 model_json = lane_following.to_json()
-with open("../LaneFollowingModel/model.json", "w") as json_file:
+with open("../LaneFollowingModel/source/model.json", "w") as json_file:
     json_file.write(model_json)
-lane_following.save_weights("../LaneFollowingModel/model_weights.h5")
+lane_following.save_weights("../LaneFollowingModel/source/model_weights.h5")
 print("Saved model to disk")
