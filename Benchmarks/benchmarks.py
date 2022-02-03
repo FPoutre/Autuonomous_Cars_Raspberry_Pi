@@ -55,7 +55,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     database = []
-    with open(args.image_directory + '/DatabasePS4.csv', newline='') as csvfile:
+    with open(args.image_directory + 'DatabasePS4.csv', newline='') as csvfile:
         csv_dict_reader = csv.DictReader(csvfile)
         for row in csv_dict_reader:
             database.append(row)
