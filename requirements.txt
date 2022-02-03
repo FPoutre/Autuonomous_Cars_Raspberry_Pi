@@ -1,0 +1,6 @@
+Cython
+numpy==1.21.4
+pandas
+tensorflow
+keras
+opencv-python
