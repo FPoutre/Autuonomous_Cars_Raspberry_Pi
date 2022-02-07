@@ -7,7 +7,7 @@ echo "Pruned Model"
 python3 benchmarks.py -m ../LaneFollowingModel/pruned/model.tflite -n 5000
 echo ""
 echo "Float16 Quantized Model"
-python3 benchmarks.py -m ../LaneFollowingModel/f16/model.tflite -n 5000
+python3 benchmarks.py -m ../LaneFollowingModel/f16q/model.tflite -n 5000
 echo ""
 echo "Dynamic Range Quantized Model"
 python3 benchmarks.py -m ../LaneFollowingModel/dq/model.tflite -n 5000
