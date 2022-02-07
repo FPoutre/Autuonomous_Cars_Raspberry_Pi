@@ -1,6 +1,12 @@
+import sys
 import time
 import cv2
 import numpy as np
+
+sys.path.append(r'/opt/ezblock')
+from picarmini import dir_servo_angle_calibration, set_dir_servo_angle
+from picarmini import set_camera_servo1_angle, set_camera_servo2_angle
+
 
 def frameCap():
     global cap
@@ -14,6 +20,11 @@ def imgPreprocess(image):
     return image
 
 if __name__ == "__main__":
+    dir_servo_angle_calibration(0)
+    set_dir_servo_angle(0)
+    set_camera_servo1_angle(0)
+    set_camera_servo2_angle(0)
+
     cap = cv2.VideoCapture(0)
 
     oImg = frameCap()
