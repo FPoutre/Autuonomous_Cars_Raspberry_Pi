@@ -18,7 +18,7 @@ class LaneFollower(threading.Thread):
 
         self.cap = cv2.VideoCapture(0)
 
-        self.interpreter = tflite.Interpreter("../LaneFollowingModel/model.tflite")
+        self.interpreter = tflite.Interpreter("../LaneFollowingModel/intq/model.tflite", num_threads=4) # Cortex A72 has 4 logical cores.
         self.interpreter.allocate_tensors()
 
         self.input_details = self.interpreter.get_input_details()
