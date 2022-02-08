@@ -60,7 +60,7 @@ if __name__ == '__main__':
         for row in csv_dict_reader:
             database.append(row)
 
-    interpreter =tf.lite.Interpreter(model_path=args.model_file)
+    interpreter = tf.lite.Interpreter(model_path=args.model_file, num_threads=4) # Cortex A72 has 4 logical cores.
     interpreter.allocate_tensors()
 
     input_details = interpreter.get_input_details()
