@@ -15,12 +15,12 @@ import matplotlib.pyplot as plt
 
 def my_imread(image_path):
     image = cv2.imread(image_path)
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     return image
 
 def img_preprocess(image):
-    height, _, _ = image.shape
-    image = image[int(height/2):,:,:]  # remove top half of the image, as it is not relavant for lane following
+    height, _ = image.shape
+    image = image[int(height/2):,:]  # remove top half of the image, as it is not relavant for lane following
     image = image / 255                # normalizing the pixel values 
     return image
 
@@ -80,7 +80,7 @@ if __name__ == '__main__':
         file = database[random.randint(1, len(database)-1)]
         img = plt.imread("{}ImagesPS4/{}.jpg".format(args.image_directory, file["Images"]))
         img = img_preprocess(img)
-        img = np.reshape(img,(-1,120,320,3)).astype('float32')
+        img = np.reshape(img,(-1,120,320)).astype('float32')
         interpreter.set_tensor(input_details[0]['index'], img)
 
         start_time = time.time()

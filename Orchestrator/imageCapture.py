@@ -12,11 +12,12 @@ from picarmini import set_camera_servo1_angle, set_camera_servo2_angle
 def frameCap():
     global cap
     ret, frame = cap.read()
-    return cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    return frame
 
 def imgPreprocess(image):
-    height, _, _ = image.shape
-    image = image[int(height/2):,:,:]  # remove top half of the image, as it is not relavant for lane following
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    height, _ = image.shape
+    image = image[int(height/2):,:]  # remove top half of the image, as it is not relavant for lane following
     # image = image / 255                # normalizing the pixel values 
     return image
 

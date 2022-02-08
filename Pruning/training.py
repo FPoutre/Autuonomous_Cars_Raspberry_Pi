@@ -109,7 +109,7 @@ print('Total Images : ',len(imagesPath))
 # This function serves to read the images in the correct way
 def my_imread(image_path):
     image = cv2.imread(image_path)
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     return image
 
 def zoom(image):
@@ -161,14 +161,14 @@ def random_augment(image, steering_angle):
     return image, steering_angle
 
 def img_preprocess(image):
-    height, _, _ = image.shape
-    image = image[int(height/2):,:,:]  # remove top half of the image, as it is not relavant for lane following
+    height, _ = image.shape
+    image = image[int(height/2):,:]  # remove top half of the image, as it is not relavant for lane following
     image = image / 255                # normalizing the pixel values 
     return image
 
 def lane_following_model():
     model = Sequential([
-      layers.Conv2D(32, (3, 3), activation='relu', input_shape=(120, 320, 3), padding='same'),
+      layers.Conv2D(32, (3, 3), activation='relu', input_shape=(120, 320), padding='same'),
       layers.MaxPooling2D((2, 2)),
       layers.Conv2D(64, (3, 3), activation='relu', padding='same'),
       layers.MaxPooling2D((2, 2)),
@@ -189,7 +189,7 @@ def lane_following_model():
     return model
 
 
-vgg_model = VGG16(weights='imagenet', include_top=False, input_shape=(120,320,3)) # include_top=False is to not keep the top layer
+vgg_model = VGG16(weights='imagenet', include_top=False, input_shape=(120,320)) # include_top=False is to not keep the top layer
 for layer in vgg_model.layers:
     layer.trainable = False
 x_vgg = Flatten()(vgg_model.output)
@@ -232,10 +232,10 @@ X_valid_batch, y_valid_batch = next(image_data_generator(xVal, yVal, nrow, False
 batch_size=16
 
 history = lane_following.fit(image_data_generator( xTrain, yTrain, batch_size=batch_size, is_training=True),
-                              steps_per_epoch=1000,
-                              epochs=100,
+                              steps_per_epoch=100,
+                              epochs=60,
                               validation_data = image_data_generator( xVal, yVal, batch_size=batch_size, is_training=False),
-                              validation_steps=300,
+                              validation_steps=30,
                               verbose = 1
                               )
 

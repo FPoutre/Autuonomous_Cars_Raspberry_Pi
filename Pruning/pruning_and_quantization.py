@@ -63,7 +63,7 @@ def loadData(path, data):
 
 def my_imread(image_path):
     image = cv2.imread(image_path)
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     return image
 
 
@@ -140,8 +140,8 @@ def random_augment(image, steering_angle):
     return image, steering_angle
 
 def img_preprocess(image):
-    height, _, _ = image.shape
-    image = image[int(height/2):,:,:]  # remove top half of the image, as it is not relavant for lane following
+    height, _ = image.shape
+    image = image[int(height/2):,:]  # remove top half of the image, as it is not relavant for lane following
     image = image / 255                # normalizing the pixel values
     return image
    

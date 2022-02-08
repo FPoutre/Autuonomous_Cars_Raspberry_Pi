@@ -3,6 +3,7 @@ import sys
 import signal
 
 sys.path.append(r'/opt/ezblock')
+from ezblock import __reset_mcu__
 from picarmini import dir_servo_angle_calibration, set_dir_servo_angle
 from picarmini import camera_servo1_angle_calibration, camera_servo2_angle_calibration
 from picarmini import set_camera_servo1_angle, set_camera_servo2_angle
@@ -25,6 +26,8 @@ def cleanup(sig, frame):
     sys.exit(0)
 
 if __name__ == "__main__":
+    __reset_mcu__()
+
     dir_servo_angle_calibration(0)
     camera_servo1_angle_calibration(-10)
     camera_servo2_angle_calibration(5)
