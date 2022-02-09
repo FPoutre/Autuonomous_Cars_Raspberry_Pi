@@ -137,7 +137,7 @@ def random_augment(image, steering_angle):
     return image, steering_angle
 
 def img_preprocess(image):
-    height, _ = image.shape
+    height, *_ = image.shape
     image = image[int(height/2):,:]  # remove top half of the image, as it is not relavant for lane following
     _, image = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
     image = image / 255                # normalizing the pixel values

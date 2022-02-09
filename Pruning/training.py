@@ -158,7 +158,7 @@ def random_augment(image, steering_angle):
     return image, steering_angle
 
 def img_preprocess(image):
-    height, _ = image.shape
+    height, *_ = image.shape
     image = image[int(height/2):,:]  # remove top half of the image, as it is not relavant for lane following
     _, image = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
     image = image / 255                # normalizing the pixel values 
@@ -230,8 +230,8 @@ X_valid_batch, y_valid_batch = next(image_data_generator(xVal, yVal, nrow, False
 batch_size=32
 
 history = lane_following.fit(image_data_generator( xTrain, yTrain, batch_size=batch_size, is_training=True),
-                              steps_per_epoch=len(xTrain)//8*batch_size,
-                              epochs=16,
+                              steps_per_epoch=len(xTrain)//batch_size,
+                              epochs=32,
                               validation_data = image_data_generator( xVal, yVal, batch_size=batch_size, is_training=False),
                               validation_steps=30,
                               verbose = 1
