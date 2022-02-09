@@ -26,9 +26,6 @@ from sklearn.model_selection import train_test_split
 # imaging
 import cv2
 from imgaug import augmenters as img_aug
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
-from PIL import Image
 
 import tensorflow_model_optimization as tfmot
 from tensorflow.keras.models import model_from_json
@@ -142,6 +139,7 @@ def random_augment(image, steering_angle):
 def img_preprocess(image):
     height, _ = image.shape
     image = image[int(height/2):,:]  # remove top half of the image, as it is not relavant for lane following
+    _, image = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
     image = image / 255                # normalizing the pixel values
     return image
    
@@ -254,8 +252,10 @@ def convert_to_tflite_f16_quantization(model_for_export):
 
 
 def representative_dataset():
-    for data in tf.data.Dataset.from_tensor_slices((get_images(xTrain))).batch(1).take(100):
-        yield [tf.dtypes.cast(data, tf.float32)]
+    # for data in tf.data.Dataset.from_tensor_slices((get_images(xTrain))).batch(1).take(100):
+    #     yield [tf.dtypes.cast(data, tf.float32)]
+    for data in get_images(xTrain)[:100]:
+        yield [data.astype(np.float32)]
 
 def convert_to_tflite_int_quantization(model):
     converter = tf.lite.TFLiteConverter.from_keras_model(model)

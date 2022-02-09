@@ -21,6 +21,7 @@ def my_imread(image_path):
 def img_preprocess(image):
     height, _ = image.shape
     image = image[int(height/2):,:]  # remove top half of the image, as it is not relavant for lane following
+    _, image = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
     image = image / 255                # normalizing the pixel values 
     return image
 
@@ -78,9 +79,9 @@ if __name__ == '__main__':
         seconds = floor(time.time() - total_start_time)%60
         print("Image {}/{}, {}m{}s".format(i+1, args.image_number, minutes, seconds), end='\r')
         file = database[random.randint(1, len(database)-1)]
-        img = plt.imread("{}ImagesPS4/{}.jpg".format(args.image_directory, file["Images"]))
+        img = my_imread("{}ImagesPS4/{}.jpg".format(args.image_directory, file["Images"]))
         img = img_preprocess(img)
-        img = np.reshape(img,(-1,120,320)).astype('float32')
+        img = np.reshape(img,(-1,120,320,1)).astype('float32')
         interpreter.set_tensor(input_details[0]['index'], img)
 
         start_time = time.time()

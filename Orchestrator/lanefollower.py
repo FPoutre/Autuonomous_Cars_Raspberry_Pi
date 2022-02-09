@@ -29,8 +29,9 @@ class LaneFollower(threading.Thread):
         return cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
     def imgPreprocess(self, image):
-        height, _, _ = image.shape
-        image = image[int(height/2):,:,:]  # remove top half of the image, as it is not relavant for lane following
+        height, _ = image.shape
+        image = image[int(height/2):,:]  # remove top half of the image, as it is not relavant for lane following
+        _, image = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
         image = image / 255                # normalizing the pixel values 
         return image
 

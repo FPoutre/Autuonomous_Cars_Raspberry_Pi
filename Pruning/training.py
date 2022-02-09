@@ -30,9 +30,6 @@ from sklearn.model_selection import train_test_split
 # imaging
 import cv2
 from imgaug import augmenters as img_aug
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
-from PIL import Image
 
 
 data = pd.read_csv("../Data/DatabasePS4.csv")
@@ -163,12 +160,13 @@ def random_augment(image, steering_angle):
 def img_preprocess(image):
     height, _ = image.shape
     image = image[int(height/2):,:]  # remove top half of the image, as it is not relavant for lane following
+    _, image = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
     image = image / 255                # normalizing the pixel values 
     return image
 
 def lane_following_model():
     model = Sequential([
-      layers.Conv2D(32, (3, 3), activation='relu', input_shape=(120, 320), padding='same'),
+      layers.Conv2D(32, (3, 3), activation='relu', input_shape=(120, 320, 1), padding='same'),
       layers.MaxPooling2D((2, 2)),
       layers.Conv2D(64, (3, 3), activation='relu', padding='same'),
       layers.MaxPooling2D((2, 2)),
@@ -189,18 +187,18 @@ def lane_following_model():
     return model
 
 
-vgg_model = VGG16(weights='imagenet', include_top=False, input_shape=(120,320)) # include_top=False is to not keep the top layer
-for layer in vgg_model.layers:
-    layer.trainable = False
-x_vgg = Flatten()(vgg_model.output)
-d_vgg = Dense(50, activation='elu')(x_vgg)
-dense3_vgg = Dense(10, activation='elu')(d_vgg)
-output_vgg = Dense(1, activation='tanh')(dense3_vgg)
-vgg = Model(inputs=vgg_model.input, outputs=output_vgg)
-optimizer_vgg = Adam(learning_rate=1e-3) # lr is learning rate
-vgg.compile(loss='mse', optimizer=optimizer_vgg)
+# vgg_model = VGG16(weights='imagenet', include_top=False, input_shape=(120,320, 1)) # include_top=False is to not keep the top layer
+# for layer in vgg_model.layers:
+#     layer.trainable = False
+# x_vgg = Flatten()(vgg_model.output)
+# d_vgg = Dense(50, activation='elu')(x_vgg)
+# dense3_vgg = Dense(10, activation='elu')(d_vgg)
+# output_vgg = Dense(1, activation='tanh')(dense3_vgg)
+# vgg = Model(inputs=vgg_model.input, outputs=output_vgg)
+# optimizer_vgg = Adam(learning_rate=1e-3) # lr is learning rate
+# vgg.compile(loss='mse', optimizer=optimizer_vgg)
 
-lane_following = vgg
+lane_following = lane_following_model()
 
 
 def image_data_generator(image_paths, steering_angles, batch_size, is_training):
@@ -229,11 +227,11 @@ nrow = 2
 X_train_batch, y_train_batch = next(image_data_generator(xTrain, yTrain, nrow, True))
 X_valid_batch, y_valid_batch = next(image_data_generator(xVal, yVal, nrow, False))
 
-batch_size=16
+batch_size=32
 
 history = lane_following.fit(image_data_generator( xTrain, yTrain, batch_size=batch_size, is_training=True),
-                              steps_per_epoch=100,
-                              epochs=60,
+                              steps_per_epoch=len(xTrain)//8*batch_size,
+                              epochs=16,
                               validation_data = image_data_generator( xVal, yVal, batch_size=batch_size, is_training=False),
                               validation_steps=30,
                               verbose = 1
