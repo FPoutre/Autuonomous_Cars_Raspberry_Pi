@@ -30,7 +30,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '--legacy',
-        action='store_false',
+        action='store_true',
         help='Tells if LaneFollower should use legacy preprocessing or not.')
     args = parser.parse_args()
 
