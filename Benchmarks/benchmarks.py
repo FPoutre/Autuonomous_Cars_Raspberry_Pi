@@ -13,16 +13,18 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 
 
-def my_imread(image_path):
+def my_imread(image_path, useLegacy):
     image = cv2.imread(image_path)
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB) if useLegacy else cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     return image
 
-def img_preprocess(image):
+def img_preprocess(image, useLegacy):
     height, *_ = image.shape
-    image = image[int(height/2):,:]  # remove top half of the image, as it is not relavant for lane following
-    _, image = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
-    image = image / 255                # normalizing the pixel values 
+    # remove top half of the image, as it is not relevant for lane following
+    image = image[int(height/2):, :, :] if useLegacy else image[int(height/2):, :]
+    if not useLegacy:
+        _, image = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+    image = image / 255 # normalizing the pixel values 
     return image
 
 if __name__ == '__main__':
@@ -53,6 +55,10 @@ if __name__ == '__main__':
         default=127.5, 
         type=float,
         help='input standard deviation')
+    parser.add_argument(
+        '--legacy',
+        action='store_true',
+        help='Tells if LaneFollower should use legacy preprocessing or not.')
     args = parser.parse_args()
 
     database = []
@@ -79,9 +85,9 @@ if __name__ == '__main__':
         seconds = floor(time.time() - total_start_time)%60
         print("Image {}/{}, {}m{}s".format(i+1, args.image_number, minutes, seconds), end='\r')
         file = database[random.randint(1, len(database)-1)]
-        img = my_imread("{}ImagesPS4/{}.jpg".format(args.image_directory, file["Images"]))
-        img = img_preprocess(img)
-        img = np.reshape(img,(-1,120,320,1)).astype('float32')
+        img = my_imread("{}ImagesPS4/{}.jpg".format(args.image_directory, file["Images"]), args.legacy)
+        img = img_preprocess(img, args.legacy)
+        img = np.reshape(img,(-1,120,320,3)).astype('float32') if args.legacy else np.reshape(img,(-1,120,320,1)).astype('float32')
         interpreter.set_tensor(input_details[0]['index'], img)
 
         start_time = time.time()

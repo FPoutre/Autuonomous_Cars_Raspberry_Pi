@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "Base Model"
-python3 benchmarks.py -m ../LaneFollowingModel/base/model.tflite -n 5000
+python3 benchmarks.py -m ../LaneFollowingModel/final-legacy/model.tflite -n 5000 --legacy
 echo ""
 echo "Pruned Model"
 python3 benchmarks.py -m ../LaneFollowingModel/pruned/model.tflite -n 5000
