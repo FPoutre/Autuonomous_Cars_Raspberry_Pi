@@ -60,7 +60,7 @@ if __name__ == '__main__':
         for row in csv_dict_reader:
             database.append(row)
 
-    interpreter = tf.lite.Interpreter(model_path=args.model_file, num_threads=4) # Cortex A72 has 4 logical cores.
+    interpreter = tf.lite.Interpreter(model_path=args.model_file, num_threads=12) # Cortex A72 has 4 logical cores.
     interpreter.allocate_tensors()
 
     input_details = interpreter.get_input_details()
@@ -80,7 +80,7 @@ if __name__ == '__main__':
         file = database[random.randint(1, len(database)-1)]
         img = my_imread("{}ImagesPS4/{}.jpg".format(args.image_directory, file["Images"]))
         img = img_preprocess(img)
-        img = np.reshape(img,(-1,120,320,1)).astype('float32')
+        img = np.reshape(img,(-1,120,320,3)).astype('float32')
         interpreter.set_tensor(input_details[0]['index'], img)
 
         start_time = time.time()

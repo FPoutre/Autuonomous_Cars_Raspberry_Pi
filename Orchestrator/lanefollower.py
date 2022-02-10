@@ -10,15 +10,17 @@ from picarmini import set_dir_servo_angle
 
 class LaneFollower(threading.Thread):
 
-    def __init__(self, freq):
+    def __init__(self, freq, useLegacy=False):
         threading.Thread.__init__(self)
 
         self.freq = freq
         self.kill = False
+        self.useLegacy = useLegacy
 
         self.cap = cv2.VideoCapture(0)
 
-        self.interpreter = tflite.Interpreter("../LaneFollowingModel/intq/model.tflite", num_threads=4) # Cortex A72 has 4 logical cores.
+        # Cortex A72 has 4 logical cores.
+        self.interpreter = tflite.Interpreter("../LaneFollowingModel/base/model.tflite", num_threads=4) if self.useLegacy else tflite.Interpreter("../LaneFollowingModel/dq/model.tflite", num_threads=4)
         self.interpreter.allocate_tensors()
 
         self.input_details = self.interpreter.get_input_details()
@@ -26,19 +28,21 @@ class LaneFollower(threading.Thread):
 
     def frameCap(self):
         ret, frame = self.cap.read()
-        return cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        return cv2.cvtColor(frame, cv2.COLOR_BGR2RGB) if self.useLegacy else cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
     def imgPreprocess(self, image):
         height, *_ = image.shape
-        image = image[int(height/2):,:]  # remove top half of the image, as it is not relavant for lane following
-        _, image = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
-        image = image / 255                # normalizing the pixel values 
+        # remove top half of the image, as it is not relevant for lane following
+        image = image[int(height/2):, :, :] if self.useLegacy else image[int(height/2):, :, :]
+        if not self.useLegacy:
+            _, image = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+        image = image / 255 # normalizing the pixel values 
         return image
 
     def predict(self):
         img = self.frameCap()
         img = self.imgPreprocess(img)
-        img = cv2.resize(img, (320, 120))
+        img = cv2.resize(img, (320, 120, 3)) if self.useLegacy else cv2.resize(img, (320, 120))
         img = np.expand_dims(img, axis=0).astype('float32')
         self.interpreter.set_tensor(self.input_details[0]['index'], img)
 

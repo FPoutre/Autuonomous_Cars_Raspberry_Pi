@@ -1,6 +1,7 @@
 from threading import Thread
 import sys
 import signal
+import argparse
 
 sys.path.append(r'/opt/ezblock')
 from ezblock import __reset_mcu__
@@ -26,6 +27,13 @@ def cleanup(sig, frame):
     sys.exit(0)
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--legacy',
+        action='store_false',
+        help='Tells if LaneFollower should use legacy preprocessing or not.')
+    args = parser.parse_args()
+
     __reset_mcu__()
 
     dir_servo_angle_calibration(0)
@@ -37,7 +45,7 @@ if __name__ == "__main__":
     set_camera_servo2_angle(0)
     backward(10)
 
-    laneFollower = LaneFollower(-1)
+    laneFollower = LaneFollower(-1, args.legacy)
     # signDetector = SignDetector(-1)
 
     laneFollower.start()
