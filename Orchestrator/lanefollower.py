@@ -33,7 +33,7 @@ class LaneFollower(threading.Thread):
     def imgPreprocess(self, image):
         height, *_ = image.shape
         # remove top half of the image, as it is not relevant for lane following
-        image = image[int(height/2):, :, :] if self.useLegacy else image[int(height/2):, :, :]
+        image = image[int(height/2):, :, :] if self.useLegacy else image[int(height/2):, :]
         if not self.useLegacy:
             _, image = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
         image = image / 255 # normalizing the pixel values 
