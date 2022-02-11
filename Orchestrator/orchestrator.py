@@ -13,17 +13,23 @@ from picarmini import stop, backward
 
 from lanefollower import LaneFollower
 # from signdetector import SignDetector
+from obstacledetector import ObstacleDetector
 
 
 def cleanup(sig, frame):
     print("Stopping all threads")
     laneFollower.kill = True
     # signDetector.kill = True
+    obstacleDetector.kill = True
+
     laneFollower.join()
     # signDetector.join()
+    obstacleDetector.join()
+    
     print("All threads stopped")
     set_dir_servo_angle(0)
     stop()
+    
     print("Goodbye !")
     sys.exit(0)
 
@@ -49,9 +55,11 @@ if __name__ == "__main__":
 
     laneFollower = LaneFollower(0.100, args.legacy)
     # signDetector = SignDetector(-1)
+    obstacleDetector = ObstacleDetector()
 
     laneFollower.start()
     # signDetector.start()
+    obstacleDetector.start()
 
     signal.signal(signal.SIGINT, cleanup)
     signal.pause()
