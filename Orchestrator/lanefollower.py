@@ -10,17 +10,17 @@ from picarmini import set_dir_servo_angle
 
 class LaneFollower(threading.Thread):
 
-    def __init__(self, freq, useLegacy=False):
+    def __init__(self, delay=-1, useLegacy=False):
         threading.Thread.__init__(self)
 
-        self.freq = freq
+        self.delay = freq
         self.kill = False
         self.useLegacy = useLegacy
 
         self.cap = cv2.VideoCapture(0)
 
         # Cortex A72 has 4 logical cores.
-        self.interpreter = tflite.Interpreter("../LaneFollowingModel/base/model.tflite", num_threads=4) if self.useLegacy else tflite.Interpreter("../LaneFollowingModel/dq/model.tflite", num_threads=4)
+        self.interpreter = tflite.Interpreter("../LaneFollowingModel/dq/model_old.tflite", num_threads=4) if self.useLegacy else tflite.Interpreter("../LaneFollowingModel/dq/model.tflite", num_threads=4)
         self.interpreter.allocate_tensors()
 
         self.input_details = self.interpreter.get_input_details()
@@ -42,8 +42,12 @@ class LaneFollower(threading.Thread):
     def predict(self):
         img = self.frameCap()
         img = self.imgPreprocess(img)
-        img = cv2.resize(img, (320, 120, 3)) if self.useLegacy else cv2.resize(img, (320, 120))
+        img = cv2.resize(img, (320, 120)) if self.useLegacy else cv2.resize(img, (320, 120))
+
         img = np.expand_dims(img, axis=0).astype('float32')
+        if not self.useLegacy:
+            img = img[..., np.newaxis]
+
         self.interpreter.set_tensor(self.input_details[0]['index'], img)
 
         start_t = time.time_ns()
@@ -56,8 +60,8 @@ class LaneFollower(threading.Thread):
         return res
 
     def run(self):
-        while not self.kill:
-            if self.freq != -1:
-                time.sleep(1/self.freq)
+        while not self.delay:
+            if self.delay != -1:
+                time.sleep(self.delay)
             angle = self.predict()
             set_dir_servo_angle(angle)

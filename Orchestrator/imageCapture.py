@@ -18,12 +18,13 @@ def imgPreprocess(image):
     image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     height, _ = image.shape
     image = image[int(height/2):,:]  # remove top half of the image, as it is not relavant for lane following
+    _, image = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
     # image = image / 255                # normalizing the pixel values 
     return image
 
 if __name__ == "__main__":
-    dir_servo_angle_calibration(0)
-    camera_servo1_angle_calibration(-10)
+    dir_servo_angle_calibration(3.35)
+    camera_servo1_angle_calibration(-6)
     camera_servo2_angle_calibration(5)
 
     set_dir_servo_angle(0)

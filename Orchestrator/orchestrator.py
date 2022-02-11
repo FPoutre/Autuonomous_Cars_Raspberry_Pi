@@ -2,6 +2,7 @@ from threading import Thread
 import sys
 import signal
 import argparse
+import time
 
 sys.path.append(r'/opt/ezblock')
 from ezblock import __reset_mcu__
@@ -35,9 +36,10 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     __reset_mcu__()
+    time.sleep(1) # Waiting for MCU to restart
 
-    dir_servo_angle_calibration(0)
-    camera_servo1_angle_calibration(-10)
+    dir_servo_angle_calibration(3.35)
+    camera_servo1_angle_calibration(-6)
     camera_servo2_angle_calibration(5)
 
     set_dir_servo_angle(0)
@@ -45,7 +47,7 @@ if __name__ == "__main__":
     set_camera_servo2_angle(0)
     backward(10)
 
-    laneFollower = LaneFollower(-1, args.legacy)
+    laneFollower = LaneFollower(0.100, args.legacy)
     # signDetector = SignDetector(-1)
 
     laneFollower.start()
