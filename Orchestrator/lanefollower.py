@@ -6,18 +6,11 @@ import tflite_runtime.interpreter as tflite
 import cv2
 
 sys.path.append(r'/opt/ezblock')
-from ezblock import __reset_mcu__
-from picarmini import dir_servo_angle_calibration, set_dir_servo_angle
+from picarmini import set_dir_servo_angle
 
 class LaneFollower(threading.Thread):
 
     def __init__(self, delay=-1, useLegacy=False):
-
-        __reset_mcu__()
-        time.sleep(1) # Waiting for MCU to restart
-
-        dir_servo_angle_calibration(3.35)
-
         threading.Thread.__init__(self)
 
         self.delay = delay
@@ -43,14 +36,13 @@ class LaneFollower(threading.Thread):
         image = image[int(height/2):, :, :] if self.useLegacy else image[int(height/2):, :]
         if not self.useLegacy:
             _, image = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
-        cv2.imwrite("../Data/orchestrator_capture.png", image)
         image = image / 255 # normalizing the pixel values 
         return image
 
     def predict(self):
         img = self.frameCap()
         img = self.imgPreprocess(img)
-        img = cv2.resize(img, (320, 120)) if self.useLegacy else cv2.resize(img, (320, 120))
+        img = cv2.resize(img, (320, 120))
 
         img = np.expand_dims(img, axis=0).astype('float32')
         if not self.useLegacy:
@@ -71,5 +63,5 @@ class LaneFollower(threading.Thread):
         while not self.kill:
             angle = int(self.predict())
             set_dir_servo_angle(angle)
-            if self.delay != -1:
+            if self.delay >= 0:
                 time.sleep(self.delay)
