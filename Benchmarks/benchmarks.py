@@ -7,10 +7,8 @@ import numpy as np
 from math import floor
 import statistics as stats
 import cv2
-#import tflite_runtime.interpreter as tflite
 
 import tensorflow as tf
-import matplotlib.pyplot as plt
 
 
 def my_imread(image_path, useLegacy):
@@ -46,16 +44,6 @@ if __name__ == '__main__':
         default='../LaneFollowingModel/model.tflite',
         help='.tflite model to be executed')
     parser.add_argument(
-        '--input_mean',
-        default=127.5, 
-        type=float,
-        help='input_mean')
-    parser.add_argument(
-        '--input_std',
-        default=127.5, 
-        type=float,
-        help='input standard deviation')
-    parser.add_argument(
         '--legacy',
         action='store_true',
         help='Tells if LaneFollower should use legacy preprocessing or not.')
@@ -83,7 +71,7 @@ if __name__ == '__main__':
     for i in range(args.image_number):
         minutes = floor(time.time() - total_start_time)//60
         seconds = floor(time.time() - total_start_time)%60
-        print("Image {}/{}, {}m{}s".format(i+1, args.image_number, minutes, seconds), end='\r')
+        print("Processing image {}/{}, {}m{}s".format(i+1, args.image_number, minutes, seconds), end='\r')
         file = database[random.randint(1, len(database)-1)]
         img = my_imread("{}ImagesPS4/{}.jpg".format(args.image_directory, file["Images"]), args.legacy)
         img = img_preprocess(img, args.legacy)
@@ -100,5 +88,5 @@ if __name__ == '__main__':
         offset_list.append(np.abs(predicted_angle - float(file["Steering"])))
     
     print("Processing image: {}/{}, {}m{}s".format(args.image_number, args.image_number, minutes, seconds))
-    print("Average time (per prediction) : {} ms".format(1000*stats.mean(time_list)))
-    print("Average prediction offset : {}°".format(stats.mean(offset_list)))
+    print("Average time (per prediction) : {:.2f} ms (sigma: {:.2f} ms)".format(1000*stats.mean(time_list), 1000*stats.stdev(time_list)))
+    print("Average prediction offset : {:.2f}° (sigma: {:.2f}°)".format(stats.mean(offset_list), stats.stdev(offset_list)))

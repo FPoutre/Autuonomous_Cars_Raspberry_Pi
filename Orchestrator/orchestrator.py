@@ -53,7 +53,7 @@ if __name__ == "__main__":
     set_camera_servo2_angle(0)
     backward(10)
 
-    laneFollower = LaneFollower(0.100, args.legacy)
+    laneFollower = LaneFollower(delay=1, useLegacy=args.legacy)
     # signDetector = SignDetector(-1)
     obstacleDetector = ObstacleDetector()
 
