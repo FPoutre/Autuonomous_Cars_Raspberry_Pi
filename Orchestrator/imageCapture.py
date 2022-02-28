@@ -4,9 +4,9 @@ import cv2
 import numpy as np
 
 sys.path.append(r'/opt/ezblock')
-from picarmini import dir_servo_angle_calibration, set_dir_servo_angle
-from picarmini import camera_servo1_angle_calibration, camera_servo2_angle_calibration
-from picarmini import set_camera_servo1_angle, set_camera_servo2_angle
+from picarx import dir_servo_angle_calibration, set_dir_servo_angle
+from picarx import camera_servo1_angle_calibration, camera_servo2_angle_calibration
+from picarx import set_camera_servo1_angle, set_camera_servo2_angle
 
 
 def frameCap():

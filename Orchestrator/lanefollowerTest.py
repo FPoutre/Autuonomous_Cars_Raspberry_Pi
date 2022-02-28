@@ -1,19 +1,22 @@
 import sys
 import time
+import signal
 
 sys.path.append(r'/opt/ezblock')
-from ezblock import __reset_mcu__
-from picarmini import dir_servo_angle_calibration, set_dir_servo_angle
+from picarx import set_dir_servo_angle
+from picarx import stop, backward, forward
 
 from lanefollower import LaneFollower
 
-__reset_mcu__()
-time.sleep(1) # Waiting for MCU to restart
+def cleanup(sig, frame):
+    print("\nGoodbye !")
+    sys.exit(0)
 
+if __name__=="__main__":
+    laneFollower = LaneFollower()
 
-laneFollower = LaneFollower()
+    signal.signal(signal.SIGINT, cleanup)
 
-# dir_servo_angle_calibration(3.35)
-predictedAngle = laneFollower.predict()
-set_dir_servo_angle(int(predictedAngle))
-time.sleep(1)
+    while True:
+        predictedAngle = laneFollower.predict()
+        set_dir_servo_angle(predictedAngle)

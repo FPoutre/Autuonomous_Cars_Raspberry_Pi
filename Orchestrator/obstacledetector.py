@@ -2,12 +2,12 @@ import sys
 import threading
 
 sys.path.append(r'/opt/ezblock')
-from picarmini import stop, backward
+from picarx import stop, backward
 from ezblock import Pin, Ultrasonic
 
 class ObstacleDetector(threading.Thread):
 
-    STOP_THRESH = 10
+    STOP_THRESH = 15
 
     def __init__(self):
         threading.Thread.__init__(self)

@@ -7,7 +7,7 @@ import cv2
 import skimage
 
 sys.path.append(r'/opt/ezblock')
-from picarmini import backward, stop
+from picarx import backward, stop
 
 class SignDetector(threading.Thread):
 

@@ -6,7 +6,8 @@ import tflite_runtime.interpreter as tflite
 import cv2
 
 sys.path.append(r'/opt/ezblock')
-from picarmini import set_dir_servo_angle
+from picarx import dir_servo_angle_calibration, set_dir_servo_angle
+from picarx import stop, backward, forward
 
 class LaneFollower(threading.Thread):
 
@@ -61,7 +62,8 @@ class LaneFollower(threading.Thread):
 
     def run(self):
         while not self.kill:
-            angle = int(self.predict())
-            set_dir_servo_angle(angle)
-            if self.delay >= 0:
+            predictedAngle = self.predict()
+            set_dir_servo_angle(predictedAngle)
+
+            if self.delay > 0:
                 time.sleep(self.delay)
